@@ -81,6 +81,7 @@ export function ReportForm() {
 
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1500))
+      console.log(formSchema.parse(data))
 
       setSubmitStatus("success")
       form.reset()
