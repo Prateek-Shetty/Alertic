@@ -5,8 +5,9 @@ import  Sidebar  from "@/components/sidebar"
 import { ChatbotButton } from "@/components/chatbot-button"
 import { ChatbotModal } from "@/components/chatbot-modal"
 import { ReportForm } from "@/components/report-form"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import SpotlightCard from '@/components/ui/SpotlightCard';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 
 export default function ReportsPage() {
   const [isChatbotOpen, setIsChatbotOpen] = useState(false)
@@ -16,6 +17,7 @@ export default function ReportsPage() {
   }
 
   return (
+    
     <main className="flex min-h-screen relative bg-black">
       {/* Chatbot Button */}
       <div className="absolute top-6 left-6 z-50">
@@ -41,7 +43,7 @@ export default function ReportsPage() {
           </TabsList>
 
           <TabsContent value="submit">
-            <Card>
+          
               <CardHeader>
                 <CardTitle>Submit a New Report</CardTitle>
                 <CardDescription>
@@ -51,7 +53,7 @@ export default function ReportsPage() {
               <CardContent>
                 <ReportForm />
               </CardContent>
-            </Card>
+              
           </TabsContent>
 
           <TabsContent value="view">
@@ -119,6 +121,8 @@ export default function ReportsPage() {
           </TabsContent>
         </Tabs>
       </div>
+      
     </main>
+    
   )
 }

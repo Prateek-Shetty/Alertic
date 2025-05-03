@@ -5,7 +5,6 @@ import {
   useMotionValue,
   useTransform,
   useSpring,
-  AnimatePresence,
 } from "framer-motion";
 import { usePathname } from "next/navigation";
 import {
@@ -16,7 +15,7 @@ import {
   Bot,
   Settings,
 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 
 const links = [
   { href: "/", icon: <Home className="w-5 h-5" />, label: "Home" },
@@ -49,11 +48,9 @@ export default function Sidebar() {
         mouseY.set(Infinity);
       }}
     >
-      <div className="flex flex-col gap-4 rounded-2xl border-2 border-neutral-700 bg-black/20 backdrop-blur-lg px-2 py-4">
+      <div className="flex flex-col gap-6 rounded-2xl border-2 border-neutral-700 bg-black/20 backdrop-blur-lg px-4 py-6">
         {links.map((link, index) => {
           const ref = useRef<HTMLDivElement>(null);
-          const [isVisible, setIsVisible] = useState(false);
-          const itemHover = useMotionValue(0);
 
           const mouseDistance = useTransform(mouseY, (val) => {
             const rect = ref.current?.getBoundingClientRect() ?? {
@@ -71,45 +68,27 @@ export default function Sidebar() {
 
           const size = useSpring(targetSize, spring);
 
-          useEffect(() => {
-            const unsub = itemHover.on("change", (latest) => {
-              setIsVisible(latest === 1);
-            });
-            return () => unsub();
-          }, []);
-
           const isActive = pathname === link.href;
 
           return (
-            <motion.div
-              key={index}
-              ref={ref}
-              style={{
-                width: size,
-                height: size,
-              }}
-              onHoverStart={() => itemHover.set(1)}
-              onHoverEnd={() => itemHover.set(0)}
-              onClick={() => (window.location.href = link.href)}
-              className={`relative flex items-center justify-center rounded-full border-2 border-neutral-700 bg-[#060606] shadow-md cursor-pointer ${
-                isActive ? "shadow-glow" : "hover:bg-white/5"
-              }`}
-            >
-              {link.icon}
-              <AnimatePresence>
-                {isVisible && (
-                  <motion.div
-                    initial={{ opacity: 0, x: 0 }}
-                    animate={{ opacity: 1, x: -10 }}
-                    exit={{ opacity: 0, x: 0 }}
-                    transition={{ duration: 0.2 }}
-                    className="absolute left-0 -translate-x-full mr-2 whitespace-nowrap rounded-md border border-neutral-700 bg-[#060606] px-2 py-1 text-xs text-white"
-                  >
-                    {link.label}
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </motion.div>
+            <div key={index} className="flex flex-col items-center gap-2">
+              <motion.div
+                ref={ref}
+                style={{
+                  width: size,
+                  height: size,
+                }}
+                onClick={() => (window.location.href = link.href)}
+                className={`flex items-center justify-center rounded-full border-2 border-neutral-700 bg-[#060606] shadow-md cursor-pointer ${
+                  isActive ? "shadow-glow" : "hover:bg-white/5"
+                }`}
+              >
+                {link.icon}
+              </motion.div>
+              <span className="text-xs text-white whitespace-nowrap">
+                {link.label}
+              </span>
+            </div>
           );
         })}
       </div>

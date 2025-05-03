@@ -6,7 +6,7 @@ import { useState, useRef, useEffect } from "react"
 import { X, Send, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Card } from "@/components/ui/card"
+import { Card } from "@/components/ui/SpotlightCard"
 import { cn } from "@/lib/utils"
 
 interface ChatbotModalProps {

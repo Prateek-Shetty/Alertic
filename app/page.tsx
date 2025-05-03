@@ -8,6 +8,8 @@ import { InfoBox } from "@/components/info-box"
 import { ChatbotButton } from "@/components/chatbot-button"
 import { ChatbotModal } from "@/components/chatbot-modal"
 import { AlertCircle, Map, FileText, Bot } from "lucide-react"
+import ShinyText from "@/components/ShinyText"
+import StarBorder from '../components/StarBorder'
 
 export default function Home() {
   const [isChatbotOpen, setIsChatbotOpen] = useState(false)
@@ -44,8 +46,8 @@ export default function Home() {
           <div className="absolute inset-0">
             <OrbBackground hoverIntensity={2.33} rotateOnHover={true} hue={36} forceHoverState={false} />
           </div>
-          <h1 className="relative text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-blue-500 leading-tight">
-            Alertic
+          <h1 className="relative text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 to-red-500 leading-tight">
+          <ShinyText text="Alertic" disabled={false} speed={3} className='custom-class' />
           </h1>
         </div>
 
@@ -61,10 +63,13 @@ export default function Home() {
       </section>
 
 
+   
+
 
       {/* Info Boxes Section */}
       <section className="z-30 w-full max-w-5xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 px-4 pb-16">
         <Link href="/alerts">
+        
           <InfoBox
             icon={<AlertCircle className="h-6 w-6 text-red-500" />}
             title="Alerts"
