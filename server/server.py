@@ -58,6 +58,15 @@ async def test():
         return jsonify({"message": "Report created successfully", "report": report.dict()}), 201
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
+
+@app.route('/api/get_reports', methods=['GET'])
+async def get_reports():
+    try:
+        reports = await prisma.report.find_many()
+        return jsonify({"reports": [report.dict() for report in reports]}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 # Wrap the Flask app with WsgiToAsgi for ASGI compatibility
