@@ -6,8 +6,9 @@ import { useState, useRef, useEffect } from "react"
 import { X, Send, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Card } from "@/components/ui/SpotlightCard"
+import { Card } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
+import { GoogleGenAI } from "@google/genai"
 
 interface ChatbotModalProps {
   isOpen: boolean
@@ -25,7 +26,7 @@ export function ChatbotModal({ isOpen, onClose }: ChatbotModalProps) {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "welcome",
-      content: "Hello! I'm your AI emergency assistant. How can I help you today?",
+      content: "Yo! I'm your AI wingman for emergencies. What’s going down? Hit me up and I got you.",
       sender: "bot",
       timestamp: new Date(),
     },
@@ -37,7 +38,14 @@ export function ChatbotModal({ isOpen, onClose }: ChatbotModalProps) {
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 })
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
-  // Scroll to bottom of messages
+  const genAI = useRef<GoogleGenAI | null>(null)
+
+  useEffect(() => {
+    genAI.current = new GoogleGenAI({
+      apiKey: process.env.NEXT_PUBLIC_GOOGLE_AI_API_KEY || "AIzaSyD_3T15tOy3CUHoGKRhXVsUtQZQe-Q68k0",
+    })
+  }, [])
+
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
   }, [messages])
@@ -56,32 +64,39 @@ export function ChatbotModal({ isOpen, onClose }: ChatbotModalProps) {
     setInput("")
     setIsLoading(true)
 
-    // Simulate API call to chatbot endpoint
-    setTimeout(() => {
-      // In a real app, this would be a fetch to your Flask backend
-      // const response = await fetch("http://localhost:5000/chatbot?query=" + encodeURIComponent(input));
-      // const data = await response.json();
+    try {
+      const prompt = `You're a calm, helpful AI assistant. Speak clearly, like a human who genuinely wants to help. Keep things friendly and simple. Avoid slang or trying to sound too casual. Here's what the user said: "${input}". Now, respond in a helpful and normal tone., keep in mind that you're in a small textboz, so your replies should be in bullet points, small and crip, no paragraphs, never send anything in bold`;
 
-      // For demo purposes, generate some responses based on keywords
-      let botResponse =
-        "I'm sorry, I don't have information about that. Would you like me to connect you with emergency services?"
 
-      const lowerInput = input.toLowerCase()
-      if (lowerInput.includes("flood")) {
-        botResponse =
-          "For flood safety: Move to higher ground immediately. Do not walk, swim, or drive through flood waters. Stay off bridges over fast-moving water. Would you like more specific advice?"
-      } else if (lowerInput.includes("fire") || lowerInput.includes("wildfire")) {
-        botResponse =
-          "For wildfire safety: If advised to evacuate, do so immediately. If trapped, call 911. Close all doors and windows, and turn off gas, power, and water if time allows. Would you like more specific advice?"
-      } else if (lowerInput.includes("hurricane")) {
-        botResponse =
-          "For hurricane safety: Evacuate if told to do so. Otherwise, stay indoors away from windows. Prepare an emergency kit with food, water, and medications. Would you like more specific advice?"
-      } else if (lowerInput.includes("earthquake")) {
-        botResponse =
-          "For earthquake safety: Drop, cover, and hold on. If indoors, stay away from windows. If outdoors, move away from buildings and utility wires. Would you like more specific advice?"
-      } else if (lowerInput.includes("help") || lowerInput.includes("emergency")) {
-        botResponse =
-          "If you're experiencing an emergency, please call 911 immediately. Would you like me to provide information about a specific type of emergency?"
+      const model = genAI.current?.models.generateContent({
+        model: "gemini-2.0-flash",
+        contents: prompt,
+      })
+
+      const response = await model
+      let botResponse = response?.text || ""
+
+      if (!botResponse || botResponse.trim() === "") {
+        const lowerInput = input.toLowerCase()
+        if (lowerInput.includes("flood")) {
+          botResponse =
+            "Alright, flood alert. Don’t mess around—head to high ground ASAP. Skip the hero move; don’t drive or walk in that water. Stay sharp. Need details for your area?"
+        } else if (lowerInput.includes("fire") || lowerInput.includes("wildfire")) {
+          botResponse =
+            "Fire in the area? Bounce if you’ve been told to. Shut windows, kill the gas and power, and don’t try to be a firefighter. You good or need evacuation tips?"
+        } else if (lowerInput.includes("hurricane")) {
+          botResponse =
+            "Hurricane incoming? If you’ve got an evac order, don’t wait. If not, bunker down—stay inside, stay away from glass. Prep your go-bag. Wanna know what to pack?"
+        } else if (lowerInput.includes("earthquake")) {
+          botResponse =
+            "Earthquake vibes? Drop, cover, and hold on like a pro. Indoors? Stay there. Outdoors? Keep clear of sketchy buildings. Need prep tips for aftershocks?"
+        } else if (lowerInput.includes("help") || lowerInput.includes("emergency")) {
+          botResponse =
+            "If this is real-time danger, stop typing and call 911, bro. If it’s info you want, I’m here—just say what’s up."
+        } else {
+          botResponse =
+            "Hmm, I don’t have the deets on that yet. Wanna try rewording it, or should I connect you with someone who does?"
+        }
       }
 
       const botMessage: Message = {
@@ -92,8 +107,20 @@ export function ChatbotModal({ isOpen, onClose }: ChatbotModalProps) {
       }
 
       setMessages((prev) => [...prev, botMessage])
+    } catch (error) {
+      console.error("Error calling Google Gemini API:", error)
+
+      const errorMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        content: "Something glitched on my side. Hit send again or give it a sec. I'm still locked in.",
+        sender: "bot",
+        timestamp: new Date(),
+      }
+
+      setMessages((prev) => [...prev, errorMessage])
+    } finally {
       setIsLoading(false)
-    }, 1000)
+    }
   }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -149,7 +176,7 @@ export function ChatbotModal({ isOpen, onClose }: ChatbotModalProps) {
         >
           <div className="flex items-center gap-2">
             <div className="h-3 w-3 rounded-full bg-purple-400 animate-pulse" />
-            <h3 className="font-semibold text-white">AI Emergency Assistant</h3>
+            <h3 className="font-semibold text-white">Emergency Help Bot</h3>
           </div>
           <Button
             variant="ghost"
@@ -167,7 +194,7 @@ export function ChatbotModal({ isOpen, onClose }: ChatbotModalProps) {
               <div
                 className={cn(
                   "max-w-[80%] rounded-lg p-3",
-                  message.sender === "user" ? "bg-blue-600 text-white" : "bg-gray-800 text-white",
+                  message.sender === "user" ? "bg-blue-600 text-white" : "bg-gray-800 text-white"
                 )}
               >
                 <p>{message.content}</p>
@@ -184,7 +211,7 @@ export function ChatbotModal({ isOpen, onClose }: ChatbotModalProps) {
             <div className="flex justify-start">
               <div className="bg-gray-800 rounded-lg p-3 flex items-center space-x-2">
                 <Loader2 className="h-4 w-4 animate-spin" />
-                <span>Thinking...</span>
+                <span>Thinking hard...</span>
               </div>
             </div>
           )}
@@ -197,7 +224,7 @@ export function ChatbotModal({ isOpen, onClose }: ChatbotModalProps) {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Ask for emergency help..."
+              placeholder="What's the situation? Spill it."
               className="bg-gray-900 border-gray-700"
             />
             <Button
