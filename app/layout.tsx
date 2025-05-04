@@ -7,8 +7,8 @@ import { ThemeProvider } from "@/components/theme-provider"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Alertic - Climatic Action Platform",
-  description: "Real-time disaster alerts and community reporting platform",
+  title: "Alertic - Climatic Action ",
+  description: "Real-time disaster & weather alerts and community reporting platform",
     generator: 'v0.dev'
 }
 

@@ -57,7 +57,7 @@ export default function Home() {
             Real-time disaster alerts and community reporting
           </h2>
           <p className="text-gray-300 text-base md:text-lg max-w-xl leading-relaxed">
-            Stay informed about natural disasters, contribute to community reports, and get AI-powered assistance during emergencies.
+            Stay informed about natural disasters, localized weather, contribute to community reports, and get AI-powered assistance during emergencies.
           </p>
         </div>
       </section>
