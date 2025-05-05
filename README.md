@@ -129,7 +129,4 @@ If this project helped you or inspired you, don’t forget to ⭐ the repo!
 
 ```
 
----
 
-Want this as a downloadable `README.md` file or need a version for GitHub Pages too?
-```
