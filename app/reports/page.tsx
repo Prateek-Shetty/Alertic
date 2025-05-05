@@ -5,7 +5,6 @@ import  Sidebar  from "@/components/sidebar"
 import { ChatbotButton } from "@/components/chatbot-button"
 import { ChatbotModal } from "@/components/chatbot-modal"
 import { ReportForm } from "@/components/report-form"
-import SpotlightCard from '@/components/ui/SpotlightCard';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 
@@ -126,3 +125,5 @@ export default function ReportsPage() {
     
   )
 }
+
+

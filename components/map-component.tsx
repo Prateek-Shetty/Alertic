@@ -18,13 +18,16 @@ interface AlertData {
 
 interface ReportData {
   id: number
-  user_id: number
+  user_id?: number
   description: string
   lat: number
   lon: number
+  latitude?: number
+  longitude?: number
   category: string
+  reportType?: string
   image_url?: string
-  timestamp: string
+  timestamp?: string
 }
 
 interface MapComponentProps {
@@ -42,9 +45,18 @@ const alertIcon = new L.Icon({
   shadowSize: [41, 41],
 })
 
-// Custom report icon
-const reportIcon = new L.Icon({
+// Custom report icons based on type
+const localWeatherIcon = new L.Icon({
   iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png",
+  shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png",
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41],
+})
+
+const disasterReportIcon = new L.Icon({
+  iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png",
   shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png",
   iconSize: [25, 41],
   iconAnchor: [12, 41],
@@ -102,27 +114,49 @@ export default function MapComponent({ alerts, reports }: MapComponentProps) {
       ))}
 
       {/* Render Report Markers */}
-      {reports.map((report) => (
-        <Marker key={`report-${report.id}`} position={[report.lat, report.lon]} icon={reportIcon}>
-          <Popup>
-            <div className="p-1">
-              <div className="flex items-center gap-1 font-bold text-blue-600 mb-1">
-                <FileText className="h-4 w-4" />
-                Community Report: {report.category}
+      {reports.map((report) => {
+        // Handle different data structures
+        const lat = report.lat || report.latitude
+        const lon = report.lon || report.longitude
+        const isDisaster = report.reportType === "Disaster"
+
+        return (
+          <Marker
+            key={`report-${report.id}`}
+            position={[lat ?? 0, lon ?? 0]}
+            icon={isDisaster ? disasterReportIcon : localWeatherIcon}
+          >
+            <Popup>
+              <div className="p-1">
+                <div
+                  className={`flex items-center gap-1 font-bold mb-1 ${isDisaster ? "text-red-600" : "text-blue-600"}`}
+                >
+                  <FileText className="h-4 w-4" />
+                  Community Report: {report.category}
+                  {report.reportType && (
+                    <span
+                      className={`text-xs px-1 py-0.5 rounded ${isDisaster ? "bg-red-100 text-red-800" : "bg-blue-100 text-blue-800"}`}
+                    >
+                      {report.reportType}
+                    </span>
+                  )}
+                </div>
+                <p className="text-sm mb-1">{report.description}</p>
+                {report.image_url && (
+                  <img
+                    src={report.image_url || "/placeholder.svg"}
+                    alt="Report image"
+                    className="w-full h-20 object-cover rounded my-1"
+                  />
+                )}
+                <p className="text-xs text-gray-500">
+                  {report.timestamp ? new Date(report.timestamp).toLocaleString() : "Recent report"}
+                </p>
               </div>
-              <p className="text-sm mb-1">{report.description}</p>
-              {report.image_url && (
-                <img
-                  src={report.image_url || "/placeholder.svg"}
-                  alt="Report image"
-                  className="w-full h-20 object-cover rounded my-1"
-                />
-              )}
-              <p className="text-xs text-gray-500">{new Date(report.timestamp).toLocaleString()}</p>
-            </div>
-          </Popup>
-        </Marker>
-      ))}
+            </Popup>
+          </Marker>
+        )
+      })}
     </MapContainer>
   )
 }

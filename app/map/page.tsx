@@ -9,6 +9,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Skeleton } from "@/components/ui/skeleton"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { AlertCircle } from "lucide-react"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 
 // Dynamically import the Map component to avoid SSR issues with Leaflet
 const MapComponent = dynamic(() => import("@/components/map-component"), {
@@ -39,6 +41,7 @@ interface ReportData {
   category: string
   image_url?: string
   timestamp: string
+  reportType?: string
 }
 
 export default function MapPage() {
@@ -51,24 +54,32 @@ export default function MapPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // In a real app, these would be actual API calls to your Flask backend
-        const alertsResponse = await fetch("http://localhost:5000/alerts")
-        const reportsResponse = await fetch("http://localhost:5000/reports")
+        setLoading(true)
 
-        if (!alertsResponse.ok || !reportsResponse.ok) {
-          throw new Error("Failed to fetch data")
+        // Fetch reports from API
+        const reportsResponse = await fetch("/api/get_reports")
+
+        if (!reportsResponse.ok) {
+          throw new Error("Failed to fetch reports")
         }
 
-        const alertsData = await alertsResponse.json()
         const reportsData = await reportsResponse.json()
 
-        setAlerts(alertsData)
-        setReports(reportsData)
-      } catch (err) {
-        console.error("Error fetching data:", err)
-        setError("Failed to load map data. Please try again later.")
+        // Transform the data to match the expected format
+        const formattedReports = (reportsData.reports || []).map((report: any) => ({
+          id: report.id,
+          user_id: 1, // Default user ID
+          description: report.description,
+          lat: report.latitude,
+          lon: report.longitude,
+          category: report.category,
+          reportType: report.reportType || "Localised Weather", // Default to Localised Weather if not specified
+          timestamp: new Date().toISOString(),
+        }))
 
-        // For demo purposes, set some sample data
+        setReports(formattedReports)
+
+        // For demo purposes, set some sample alerts
         setAlerts([
           {
             id: 1,
@@ -89,27 +100,13 @@ export default function MapPage() {
             timestamp: new Date().toISOString(),
           },
         ])
+      } catch (err) {
+        console.error("Error fetching data:", err)
+        setError("Failed to load map data. Please try again later.")
 
-        setReports([
-          {
-            id: 1,
-            user_id: 101,
-            description: "Road blocked by fallen trees",
-            lat: 40.7282,
-            lon: -73.9942,
-            category: "Infrastructure",
-            timestamp: new Date().toISOString(),
-          },
-          {
-            id: 2,
-            user_id: 102,
-            description: "Power outage affecting entire neighborhood",
-            lat: 34.0622,
-            lon: -118.2537,
-            category: "Utility",
-            timestamp: new Date().toISOString(),
-          },
-        ])
+        // Set empty arrays if there's an error
+        setReports([])
+        setAlerts([])
       } finally {
         setLoading(false)
       }
@@ -201,6 +198,38 @@ export default function MapPage() {
             <CardHeader>
               <CardTitle>Community Reports</CardTitle>
               <CardDescription>User submitted reports</CardDescription>
+              <div className="flex gap-2 mt-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setReports((prevReports) => [...prevReports])}
+                  className="text-xs"
+                >
+                  All
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() =>
+                    setReports((prevReports) =>
+                      prevReports.filter((report) => report.reportType === "Localised Weather"),
+                    )
+                  }
+                  className="text-xs bg-blue-600 text-white hover:bg-blue-700"
+                >
+                  Localised Weather
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() =>
+                    setReports((prevReports) => prevReports.filter((report) => report.reportType === "Disaster"))
+                  }
+                  className="text-xs bg-red-600 text-white hover:bg-red-700"
+                >
+                  Disaster
+                </Button>
+              </div>
             </CardHeader>
             <CardContent>
               {loading ? (
@@ -213,7 +242,12 @@ export default function MapPage() {
                   {reports.map((report) => (
                     <li key={report.id} className="p-3 bg-gray-800 rounded-md">
                       <div className="flex items-center justify-between">
-                        <span className="font-medium">{report.category}</span>
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium">{report.category}</span>
+                          <Badge className={report.reportType === "Disaster" ? "bg-red-600" : "bg-blue-600"}>
+                            {report.reportType}
+                          </Badge>
+                        </div>
                         <span className="text-xs text-gray-400">{new Date(report.timestamp).toLocaleString()}</span>
                       </div>
                       <p className="text-sm text-gray-400 mt-1">{report.description}</p>
