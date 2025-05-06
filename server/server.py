@@ -69,7 +69,7 @@ async def get_reports():
         return jsonify({"error": str(e)}), 500
 
 
-# Wrap the Flask app with WsgiToAsgi for ASGI compatibility
+
 asgi_app = WsgiToAsgi(app)
 
 
