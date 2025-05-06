@@ -338,7 +338,7 @@ export function ReportForm() {
       }
 
       // Send to API
-      const response = await fetch("/api/test", {
+      const response = await fetch("http://localhost:8000/api/test", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
