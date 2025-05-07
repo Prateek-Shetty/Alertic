@@ -1,17 +1,25 @@
 "use client"
 
+import type React from "react"
+
 import { useState, useEffect } from "react"
 import Sidebar from "@/components/sidebar"
 import { ChatbotButton } from "@/components/chatbot-button"
 import { ChatbotModal } from "@/components/chatbot-modal"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Badge } from "@/components/ui/badge"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { AlertCircle, AlertTriangle, Flame, Wind } from "lucide-react"
+import { AlertCircle, AlertTriangle, Flame, Wind, Bell, Phone } from "lucide-react"
 import { Droplets } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { BackgroundBeamsWithCollision } from "@/components/ui/background-beams-with-collision"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Switch } from "@/components/ui/switch"
+import { toast } from "@/components/ui/use-toast"
+import { ToastAction } from "@/components/ui/toast"
 
 interface AlertData {
   id: number
@@ -29,7 +37,16 @@ export default function AlertsPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [reports, setReports] = useState<any[]>([])
-  const [activeTab, setActiveTab] = useState<"alerts" | "reports">("alerts")
+  const [activeTab, setActiveTab] = useState<"alerts" | "reports" | "settings">("alerts")
+  const [phoneNumber, setPhoneNumber] = useState("")
+  const [isSubscribed, setIsSubscribed] = useState(true)
+  const [notificationTypes, setNotificationTypes] = useState({
+    disaster: true,
+    weather: true,
+    infrastructure: true,
+    medical: false,
+    utility: true,
+  })
 
   useEffect(() => {
     const fetchAlerts = async () => {
@@ -127,6 +144,22 @@ export default function AlertsPage() {
     }
 
     fetchReports()
+
+    // Load saved phone number from localStorage if available
+    const savedPhone = localStorage.getItem("alertic_phone_number")
+    if (savedPhone) {
+      setPhoneNumber(savedPhone)
+    }
+
+    const savedSubscription = localStorage.getItem("alertic_subscribed")
+    if (savedSubscription !== null) {
+      setIsSubscribed(savedSubscription === "true")
+    }
+
+    const savedNotificationTypes = localStorage.getItem("alertic_notification_types")
+    if (savedNotificationTypes) {
+      setNotificationTypes(JSON.parse(savedNotificationTypes))
+    }
   }, [])
 
   const toggleChatbot = () => {
@@ -145,6 +178,42 @@ export default function AlertsPage() {
       default:
         return <AlertTriangle className="h-5 w-5 text-yellow-500" />
     }
+  }
+
+  const handlePhoneSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+
+    // Basic phone validation
+    const phoneRegex = /^\+?[0-9]{10,15}$/
+    if (!phoneRegex.test(phoneNumber)) {
+      toast({
+        title: "Invalid phone number",
+        description: "Please enter a valid phone number with country code",
+        variant: "destructive",
+      })
+      return
+    }
+
+    // Save to localStorage (in a real app, this would be saved to a database)
+    localStorage.setItem("alertic_phone_number", phoneNumber)
+    localStorage.setItem("alertic_subscribed", isSubscribed.toString())
+    localStorage.setItem("alertic_notification_types", JSON.stringify(notificationTypes))
+
+    // Show success message
+    toast({
+      title: "Settings updated",
+      description: isSubscribed
+        ? "You will now receive WhatsApp alerts for new reports"
+        : "You have unsubscribed from WhatsApp alerts",
+      action: <ToastAction altText="Close">Close</ToastAction>,
+    })
+  }
+
+  const handleNotificationTypeChange = (type: keyof typeof notificationTypes) => {
+    setNotificationTypes((prev) => ({
+      ...prev,
+      [type]: !prev[type],
+    }))
   }
 
   return (
@@ -169,28 +238,16 @@ export default function AlertsPage() {
 
         {/* Main Content */}
         <div className="flex-1 p-8 ml-0 mr-16">
-          <h1 className="text-3xl font-bold mb-6">Active Alerts</h1>
+          <h1 className="text-3xl font-bold mb-6">Alerts & Notifications</h1>
 
-          <div className="flex space-x-2 mb-6">
-            <Button
-              variant={activeTab === "alerts" ? "default" : "outline"}
-              onClick={() => setActiveTab("alerts")}
-              className="bg-orange-600 hover:bg-orange-700 text-white"
-            >
-              Official Alerts
-            </Button>
-            <Button
-              variant={activeTab === "reports" ? "default" : "outline"}
-              onClick={() => setActiveTab("reports")}
-              className="bg-blue-600 hover:bg-blue-700 text-white"
-            >
-              Community Reports
-            </Button>
-          </div>
+          <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as any)} className="w-full">
+            <TabsList className="grid w-full max-w-md grid-cols-3 mb-6">
+              <TabsTrigger value="alerts">Official Alerts</TabsTrigger>
+              <TabsTrigger value="reports">Community Reports</TabsTrigger>
+              <TabsTrigger value="settings">Notification Settings</TabsTrigger>
+            </TabsList>
 
-          {activeTab === "alerts" ? (
-            // Existing alerts code
-            <>
+            <TabsContent value="alerts">
               {error && (
                 <Alert variant="destructive" className="mb-4">
                   <AlertCircle className="h-4 w-4" />
@@ -257,10 +314,9 @@ export default function AlertsPage() {
                   </CardContent>
                 </Card>
               )}
-            </>
-          ) : (
-            // Reports display
-            <>
+            </TabsContent>
+
+            <TabsContent value="reports">
               <div className="flex space-x-2 mb-4">
                 <Button variant="outline" size="sm" onClick={() => setReports((prevReports) => [...prevReports])}>
                   All Reports
@@ -338,8 +394,107 @@ export default function AlertsPage() {
                   </CardContent>
                 </Card>
               )}
-            </>
-          )}
+            </TabsContent>
+
+            <TabsContent value="settings">
+              <Card className="bg-black/60 border-white/10">
+                <CardHeader>
+                  <div className="flex items-center gap-2">
+                    <Phone className="h-5 w-5 text-green-500" />
+                    <CardTitle>WhatsApp Alert Settings</CardTitle>
+                  </div>
+                  <CardDescription>
+                    Receive instant WhatsApp notifications when new reports are submitted in your area
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <form onSubmit={handlePhoneSubmit} className="space-y-6">
+                    <div className="space-y-2">
+                      <Label htmlFor="phone-number">Your WhatsApp Number</Label>
+                      <Input
+                        id="phone-number"
+                        type="tel"
+                        placeholder="+1234567890"
+                        value={phoneNumber}
+                        onChange={(e) => setPhoneNumber(e.target.value)}
+                        className="bg-black/40 border-gray-700"
+                      />
+                      <p className="text-xs text-gray-400">
+                        Enter your phone number with country code (e.g., +1 for USA)
+                      </p>
+                    </div>
+
+                    <div className="flex items-center space-x-2">
+                      <Switch id="subscribe" checked={isSubscribed} onCheckedChange={setIsSubscribed} />
+                      <Label htmlFor="subscribe">Receive WhatsApp alerts</Label>
+                    </div>
+
+                    {isSubscribed && (
+                      <div className="space-y-3 pt-2">
+                        <Label>Alert me about:</Label>
+                        <div className="space-y-2">
+                          <div className="flex items-center space-x-2">
+                            <Switch
+                              id="disaster-alerts"
+                              checked={notificationTypes.disaster}
+                              onCheckedChange={() => handleNotificationTypeChange("disaster")}
+                            />
+                            <Label htmlFor="disaster-alerts">Disaster reports</Label>
+                          </div>
+
+                          <div className="flex items-center space-x-2">
+                            <Switch
+                              id="weather-alerts"
+                              checked={notificationTypes.weather}
+                              onCheckedChange={() => handleNotificationTypeChange("weather")}
+                            />
+                            <Label htmlFor="weather-alerts">Weather reports</Label>
+                          </div>
+
+                          <div className="flex items-center space-x-2">
+                            <Switch
+                              id="infrastructure-alerts"
+                              checked={notificationTypes.infrastructure}
+                              onCheckedChange={() => handleNotificationTypeChange("infrastructure")}
+                            />
+                            <Label htmlFor="infrastructure-alerts">Infrastructure reports</Label>
+                          </div>
+
+                          <div className="flex items-center space-x-2">
+                            <Switch
+                              id="utility-alerts"
+                              checked={notificationTypes.utility}
+                              onCheckedChange={() => handleNotificationTypeChange("utility")}
+                            />
+                            <Label htmlFor="utility-alerts">Utility reports</Label>
+                          </div>
+
+                          <div className="flex items-center space-x-2">
+                            <Switch
+                              id="medical-alerts"
+                              checked={notificationTypes.medical}
+                              onCheckedChange={() => handleNotificationTypeChange("medical")}
+                            />
+                            <Label htmlFor="medical-alerts">Medical reports</Label>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    <Button type="submit" className="w-full bg-green-600 hover:bg-green-700">
+                      Save Notification Settings
+                    </Button>
+                  </form>
+                </CardContent>
+                <CardFooter className="bg-black/40 border-t border-gray-800 text-sm text-gray-400">
+                  <div className="flex items-center gap-2">
+                    <Bell className="h-4 w-4" />
+                    <p>Your privacy is important. We will only use your number for emergency alerts.</p>
+                  </div>
+                </CardFooter>
+              </Card>
+            </TabsContent>
+          </Tabs>
         </div>
       </main>
     </BackgroundBeamsWithCollision>

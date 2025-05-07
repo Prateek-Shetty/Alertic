@@ -1,16 +1,15 @@
 "use client"
 
-import React, { useState } from "react"
+import { useState } from "react"
 import Link from "next/link"
 import OrbBackground from "@/components/orb-background"
 import Sidebar from "@/components/sidebar"
 import { InfoBox } from "@/components/info-box"
 import { ChatbotButton } from "@/components/chatbot-button"
 import { ChatbotModal } from "@/components/chatbot-modal"
-import { AlertCircle, Map, FileText, Bot } from 'lucide-react'
+import { AlertCircle, Map, FileText, Bot } from "lucide-react"
 import ShinyText from "@/components/ShinyText"
 import { BackgroundBeamsWithCollision } from "@/components/ui/background-beams-with-collision"
-
 
 export default function Home() {
   const [isChatbotOpen, setIsChatbotOpen] = useState(false)
@@ -27,7 +26,6 @@ export default function Home() {
       beamCount={15}
     >
       <main className="relative min-h-screen w-full flex flex-col items-center justify-center overflow-x-hidden bg-black/50 backdrop-blur-sm text-white">
-
         {/* Chatbot Button */}
         <div className="absolute top-6 left-6 z-50">
           <ChatbotButton onClick={toggleChatbot} />
@@ -49,7 +47,7 @@ export default function Home() {
               <OrbBackground hoverIntensity={2.33} rotateOnHover={true} hue={36} forceHoverState={false} />
             </div>
             <h1 className="relative text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 to-red-500 leading-tight">
-            <ShinyText text="Alertic" disabled={false} speed={3} className='custom-class' />
+              <ShinyText text="Alertic" disabled={false} speed={3} className="custom-class" />
             </h1>
           </div>
 
@@ -59,7 +57,8 @@ export default function Home() {
               Real-time disaster alerts and community reporting
             </h2>
             <p className="text-gray-300 text-base md:text-lg max-w-xl leading-relaxed">
-              Stay informed about natural disasters, localized weather, contribute to community reports, and get AI-powered assistance during emergencies.
+              Stay informed about natural disasters, localized weather, contribute to community reports, and get
+              AI-powered assistance during emergencies.
             </p>
           </div>
         </section>
@@ -67,7 +66,6 @@ export default function Home() {
         {/* Info Boxes Section */}
         <section className="z-30 w-full max-w-5xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 px-4 pb-16">
           <Link href="/alerts">
-          
             <InfoBox
               icon={<AlertCircle className="h-6 w-6 text-red-500" />}
               title="Alerts"
