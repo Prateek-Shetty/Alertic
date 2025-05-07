@@ -8,6 +8,7 @@ import { InfoBox } from "@/components/info-box"
 import { ChatbotButton } from "@/components/chatbot-button"
 import { ChatbotModal } from "@/components/chatbot-modal"
 import { AlertCircle, Map, FileText, Bot } from "lucide-react"
+import {BackgroundBeamsWithCollision} from "@/components/ui/background-beams-with-collision"
 import ShinyText from "@/components/ShinyText"
 
 
@@ -19,6 +20,11 @@ export default function Home() {
   }
 
   return (
+    <BackgroundBeamsWithCollision
+          beamColor1="rgba(30, 226, 43, 0.78)"
+          beamColor2="rgba(13, 24, 229, 0.75)"
+          beamColor3="rgba(185, 55, 16, 0.84)"
+        >
     <main className="relative min-h-screen w-full flex flex-col items-center justify-center overflow-x-hidden bg-black text-white">
 
       {/* Page-wide Background Orb Layer
@@ -99,5 +105,6 @@ export default function Home() {
         </Link>
       </section>
     </main>
+    </BackgroundBeamsWithCollision>
   )
 }
