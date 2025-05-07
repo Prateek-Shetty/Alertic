@@ -168,7 +168,7 @@ export function ChatbotModal({ isOpen, onClose }: ChatbotModalProps) {
   if (!isOpen) return null
 
   return (
-    <div className="fixed z-50 w-96 h-[500px] shadow-xl" style={{ left: `${position.x}px`, top: `${position.y}px` }}>
+    <div className="fixed z-[9999] w-96 h-[500px] shadow-xl" style={{ left: `${position.x}px`, top: `${position.y}px` }}>
       <Card className="flex flex-col h-full border border-white/10 bg-black/90 backdrop-blur-lg overflow-hidden">
         <div
           className="p-3 bg-gradient-to-r from-purple-900 to-blue-900 flex justify-between items-center cursor-move"

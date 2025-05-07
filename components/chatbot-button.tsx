@@ -73,7 +73,7 @@ export function ChatbotButton({ onClick }: ChatbotButtonProps) {
       onMouseDown={handleMouseDown}
       onClick={onClick}
       className={cn(
-        "fixed z-50 cursor-pointer transition-transform active:scale-95",
+        "fixed z-[9999] cursor-pointer transition-transform active:scale-95",
         "shadow-[0_0_20px_5px_rgba(128,0,255,0.6)] bg-gradient-to-br from-purple-700 to-indigo-600",
         "backdrop-blur-lg border border-white/20 rounded-full w-14 h-14 flex items-center justify-center",
       )}

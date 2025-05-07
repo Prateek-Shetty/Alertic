@@ -9,7 +9,7 @@ import { ChatbotButton } from "@/components/chatbot-button"
 import { ChatbotModal } from "@/components/chatbot-modal"
 import { AlertCircle, Map, FileText, Bot } from "lucide-react"
 import ShinyText from "@/components/ShinyText"
-import StarBorder from '../components/StarBorder'
+
 
 export default function Home() {
   const [isChatbotOpen, setIsChatbotOpen] = useState(false)
