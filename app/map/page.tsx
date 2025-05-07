@@ -138,13 +138,7 @@ export default function MapPage() {
       <div className="flex-1 p-8 ml-0 mr-16">
         <h1 className="text-3xl font-bold mb-6">Interactive Disaster Map</h1>
 
-        {error && (
-          <Alert variant="destructive" className="mb-4">
-            <AlertCircle className="h-4 w-4" />
-            <AlertTitle>Error</AlertTitle>
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        )}
+        
 
         <Card className="mb-6">
           <CardHeader>

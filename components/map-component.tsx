@@ -5,6 +5,7 @@ import L from "leaflet"
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet"
 import "leaflet/dist/leaflet.css"
 import { AlertTriangle, FileText } from "lucide-react"
+import axios from "axios"
 
 interface AlertData {
   id: number
@@ -66,7 +67,8 @@ const disasterReportIcon = new L.Icon({
 
 export default function MapComponent({ alerts, reports }: MapComponentProps) {
   // Default center position (can be adjusted based on user location or data)
-  const [center, setCenter] = useState<[number, number]>([40.7128, -74.006])
+  const [center, setCenter] = useState<[number, number]>([12.9716, 77.5946]); // Default center set to India
+  const [fetchedReports, setFetchedReports] = useState<ReportData[]>([])
   const leafletInitialized = useRef(false)
 
   // Fix for Leaflet marker icons in Next.js
@@ -81,6 +83,18 @@ export default function MapComponent({ alerts, reports }: MapComponentProps) {
       })
       leafletInitialized.current = true
     }
+  }, [])
+
+  // Fetch reports from API
+  useEffect(() => {
+    axios
+      .get("http://localhost:8000/api/get_reports")
+      .then((response) => {
+        setFetchedReports(response.data.reports)
+      })
+      .catch((error) => {
+        console.error("Error fetching reports:", error)
+      })
   }, [])
 
   // Adjust center based on alerts if available
@@ -157,6 +171,21 @@ export default function MapComponent({ alerts, reports }: MapComponentProps) {
           </Marker>
         )
       })}
+
+      {/* Render Fetched Report Markers */}
+      {fetchedReports.map((report) => (
+        <Marker
+          key={`fetched-report-${report.id}`}
+          position={[report.latitude ?? 0, report.longitude ?? 0]}
+          icon={localWeatherIcon}
+        >
+          <Popup>
+            <div className="p-1">
+              <p className="text-sm mb-1">{report.description}</p>
+            </div>
+          </Popup>
+        </Marker>
+      ))}
     </MapContainer>
   )
 }
