@@ -7,6 +7,7 @@ import { ChatbotModal } from "@/components/chatbot-modal"
 import { ReportForm } from "@/components/report-form"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { BackgroundBeamsWithCollision } from "@/components/ui/background-beams-with-collision"
 
 // Define TypeScript types for reports
 interface Report {
@@ -45,6 +46,11 @@ export default function ReportsPage() {
   }, [])
 
   return (
+    <BackgroundBeamsWithCollision
+      beamColor1="rgba(16, 185, 129, 0.15)"
+      beamColor2="rgba(59, 130, 246, 0.15)"
+      beamColor3="rgba(139, 92, 246, 0.15)"
+    >
     <main className="flex min-h-screen relative bg-black">
       {/* Chatbot Button */}
       <div className="absolute top-6 left-6 z-50">
@@ -118,5 +124,6 @@ export default function ReportsPage() {
         </Tabs>
       </div>
     </main>
+    </BackgroundBeamsWithCollision>
   )
 }
