@@ -7,6 +7,7 @@ import { ChatbotModal } from "@/components/chatbot-modal"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Bot, Shield, Heart, Home } from "lucide-react"
+import { BackgroundBeamsWithCollision } from "@/components/ui/background-beams-with-collision";
 
 export default function AIHelpPage() {
   const [isChatbotOpen, setIsChatbotOpen] = useState(false)
@@ -16,6 +17,7 @@ export default function AIHelpPage() {
   }
 
   return (
+    <BackgroundBeamsWithCollision>
     <main className="flex min-h-screen relative bg-black">
       {/* Chatbot Button */}
       <div className="absolute top-6 left-6 z-50">
@@ -31,6 +33,7 @@ export default function AIHelpPage() {
       </div>
 
       {/* Main Content */}
+      
       <div className="flex-1 p-8 ml-0 mr-16">
         <div className="flex items-center gap-3 mb-6">
           <Bot className="h-8 w-8 text-purple-500" />
@@ -174,5 +177,6 @@ export default function AIHelpPage() {
         </Tabs>
       </div>
     </main>
+    </BackgroundBeamsWithCollision>
   )
 }
