@@ -17,12 +17,18 @@ export default function AIHelpPage() {
   }
 
   return (
-    <BackgroundBeamsWithCollision
-      beamColor1="rgba(139, 92, 246, 0.15)"
-      beamColor2="rgba(59, 130, 246, 0.15)"
-      beamColor3="rgba(16, 185, 129, 0.15)"
-    >
-      <main className="flex min-h-screen relative bg-black/50 backdrop-blur-sm">
+    <div className="relative min-h-screen bg-black">
+      <BackgroundBeamsWithCollision
+        beamColor1="rgba(139, 92, 246, 0.08)"
+        beamColor2="rgba(59, 130, 246, 0.08)"
+        beamColor3="rgba(16, 185, 129, 0.08)"
+        beamCount={10}
+        className="fixed inset-0 -z-10"
+      >
+        {/* Add any valid children content here */}
+        <div className="hidden" />
+      </BackgroundBeamsWithCollision>
+      <main className="flex min-h-screen relative backdrop-blur-sm z-10">
         {/* Chatbot Button */}
         <div className="absolute top-6 left-6 z-50">
           <ChatbotButton onClick={toggleChatbot} />
@@ -180,6 +186,7 @@ export default function AIHelpPage() {
           </Tabs>
         </div>
       </main>
-    </BackgroundBeamsWithCollision>
+    </div>
+    
   )
 }
