@@ -103,11 +103,15 @@ export const BackgroundBeamsWithCollision = ({
   useEffect(() => {
     if (!ctx || beams.length === 0) return
 
+    // Use refs to store mutable state
+    const beamsRef = useRef(beams)
+    const particlesRef = useRef(particles)
+
     const animate = () => {
       ctx.clearRect(0, 0, dimensions.width, dimensions.height)
 
       // Update and draw beams
-      const updatedBeams = beams.map((beam) => {
+      beamsRef.current = beamsRef.current.map((beam) => {
         const newBeam = { ...beam }
         newBeam.angle += newBeam.angleSpeed
         newBeam.x += Math.cos(newBeam.angle) * newBeam.speed
@@ -132,11 +136,9 @@ export const BackgroundBeamsWithCollision = ({
         return newBeam
       })
 
-      setBeams(updatedBeams)
-
       // Update and draw particles
       if (!disableParticles) {
-        const updatedParticles = particles.map((particle) => {
+        particlesRef.current = particlesRef.current.map((particle) => {
           const newParticle = { ...particle }
           newParticle.x += Math.cos(newParticle.angle) * newParticle.speed
           newParticle.y += Math.sin(newParticle.angle) * newParticle.speed
@@ -155,8 +157,6 @@ export const BackgroundBeamsWithCollision = ({
 
           return newParticle
         })
-
-        setParticles(updatedParticles)
       }
 
       animationRef.current = requestAnimationFrame(animate)
@@ -167,7 +167,7 @@ export const BackgroundBeamsWithCollision = ({
     return () => {
       cancelAnimationFrame(animationRef.current)
     }
-  }, [ctx, beams, particles, dimensions, disableParticles])
+  }, [ctx, dimensions, disableParticles])
 
   return (
     <div className={cn("relative overflow-hidden", className)}>
